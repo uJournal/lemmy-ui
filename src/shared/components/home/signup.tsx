@@ -32,6 +32,13 @@ import { HtmlTags } from "../common/html-tags";
 import { Icon, Spinner } from "../common/icon";
 import { MarkdownTextArea } from "../common/markdown-textarea";
 
+var gapi;
+
+if (isBrowser()) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  gapi = require("gapi-script").gapi;
+}
+
 const passwordStrengthOptions: Options<string> = [
   {
     id: 0,
@@ -358,6 +365,7 @@ export class Signup extends Component<any, State> {
             value={toUndefined(this.state.registerForm.honeypot)}
             onInput={linkEvent(this, this.handleHoneyPotChange)}
           />
+
           <div class="form-group row">
             <div class="col-sm-10">
               <button type="submit" class="btn btn-secondary">
@@ -369,9 +377,34 @@ export class Signup extends Component<any, State> {
               </button>
             </div>
           </div>
+
+          <div id="my-signin2">{this.registerGoogle()}</div>
         </form>
       ),
       none: <></>,
+    });
+  }
+
+  registerGoogle() {
+    if (!isBrowser()) {
+      return <></>;
+    }
+
+    function onSuccess(googleUser) {
+      console.log("Logged in as: " + googleUser.getBasicProfile().getName());
+    }
+    function onFailure(error) {
+      console.log(error);
+    }
+
+    return gapi.signin2.render("my-signin2", {
+      scope: "profile email",
+      width: 240,
+      height: 50,
+      longtitle: true,
+      theme: "dark",
+      onsuccess: onSuccess,
+      onfailure: onFailure,
     });
   }
 
