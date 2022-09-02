@@ -1,6 +1,5 @@
 import { None, Option, Some } from "@sniptt/monads";
 import { Options, passwordStrength } from "check-password-strength";
-import { gapi } from "gapi-script";
 import { I18nKeys } from "i18next";
 import { Component, linkEvent } from "inferno";
 import { T } from "inferno-i18next-dess";
@@ -32,6 +31,13 @@ import {
 import { HtmlTags } from "../common/html-tags";
 import { Icon, Spinner } from "../common/icon";
 import { MarkdownTextArea } from "../common/markdown-textarea";
+
+var gapi;
+
+if (isBrowser()) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  gapi = require("gapi-script").gapi;
+}
 
 const passwordStrengthOptions: Options<string> = [
   {
@@ -380,6 +386,10 @@ export class Signup extends Component<any, State> {
   }
 
   registerGoogle() {
+    if (!isBrowser()) {
+      return <></>;
+    }
+
     function onSuccess(googleUser) {
       console.log("Logged in as: " + googleUser.getBasicProfile().getName());
     }
